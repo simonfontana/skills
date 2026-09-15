@@ -13,4 +13,4 @@ A collection of agent skills that encode reusable conventions and workflows.
 
 ## Usage
 
-Each skill is self-contained in a `SKILL.md` file with a YAML frontmatter `description` that controls when an agent automatically invokes it. Point your agent configuration at the relevant `SKILL.md` to enable it.
+Each skill lives in its own directory around a `SKILL.md` file with a YAML frontmatter `description` that controls when an agent automatically invokes it. Point your agent configuration at the relevant `SKILL.md` to enable it. Some skills ship supporting scripts alongside it; `SKILL.md` explains when they are needed and how to set them up.

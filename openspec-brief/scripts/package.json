@@ -1,0 +1,13 @@
+{
+  "name": "openspec-brief-mermaid-validator",
+  "private": true,
+  "type": "module",
+  "description": "Dependencies for validate-mermaid.mjs. Run npm install here to enable it.",
+  "scripts": {
+    "test": "node --test validate-mermaid.test.mjs"
+  },
+  "dependencies": {
+    "jsdom": "^26.0.0",
+    "mermaid": "^11.0.0"
+  }
+}

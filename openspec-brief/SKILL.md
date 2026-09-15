@@ -167,12 +167,19 @@ Write the draft, then delete. This step is not optional; it's where the document
 
 ## Mermaid that actually renders
 
-A broken diagram is worse than none — some viewers show a raw error block. Validate every diagram before you hand the document over:
+A broken diagram is worse than none — some viewers show a raw error block. Check every diagram before you hand the document over.
 
-- In VS Code, the `mermaid-diagram-validator` tool, contributed by the [Mermaid Chart extension](https://marketplace.visualstudio.com/items?itemName=MermaidChart.vscode-mermaid-chart). It's an agent tool, not a CLI — it exists only when that extension is installed.
-- Anywhere else, `npx -y @mermaid-js/mermaid-cli -i <file>.md -o /dev/null`.
+There is a parser-based checker, which is the reliable option when it's available:
 
-If neither is available, say so and offer to install one rather than shipping unchecked diagrams. Whatever you use, these are the failures that bite most often:
+```bash
+node <skill-dir>/scripts/validate-mermaid.mjs <brief>.md
+```
+
+`<skill-dir>` is the directory holding this file — the working directory is your project, not the skill, so the path has to be absolute or relative to here. The script checks each `mermaid` block with `mermaid.parse()`, which validates syntax without rendering, so no browser is involved. It takes any number of files, prints `file:line` and the diagram type per block, and exits non-zero if any fail.
+
+It needs `mermaid` and `jsdom`. If they're missing it exits 3 and prints the `npm install` command instead of running it. Show the user that command and ask — never install on their behalf. If they decline, or Node isn't available, fall back to reading each diagram yourself against the list below. That catches most of what the parser would, and an unchecked diagram is the only outcome worth avoiding.
+
+These are the failures that bite most often:
 
 - Parentheses, brackets, colons and commas in node labels break the parser. Quote the label: `A["Coordinator (v2)"]`.
 - `end` as a bare node name or label collides with `subgraph`'s terminator. Capitalize or quote it.
