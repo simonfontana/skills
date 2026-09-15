@@ -89,8 +89,10 @@ Decide where it goes before you write. Someone who asked for a doc to share, rev
 When you do write a file, write one markdown file. Default location, unless the user says otherwise:
 
 ```
-openspec/changes/<name>/brief-for-developers.md
+openspec/briefs/<change-name>-brief.md
 ```
+
+Never write inside `openspec/changes/<name>/`. That directory's contents are schema-defined, and `openspec archive` moves the whole thing to `changes/archive/<date>-<name>/` when the change ships — a brief stored there relocates, and every link to it breaks, at exactly the moment reviewers go looking for it. A sibling `briefs/` directory keeps the brief next to the specs it explains without being part of them.
 
 Keep this five-beat spine and its order — problem → shape → behavior → code → caveats is how a developer reads. Make the headings concrete where a concrete heading is clearly better ("Today: suspending only pauses the scheduler" beats "The problem").
 
