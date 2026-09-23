@@ -1,5 +1,5 @@
 {
-  "name": "openspec-brief-mermaid-validator",
+  "name": "spec-to-dev-brief-mermaid-validator",
   "private": true,
   "type": "module",
   "description": "Dependencies for validate-mermaid.mjs. Run npm install here to enable it.",

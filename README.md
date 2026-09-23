@@ -9,7 +9,7 @@ A collection of agent skills that encode reusable conventions and workflows.
 | [`agents-md`](agents-md/SKILL.md) | Create and maintain `AGENTS.md` / `CLAUDE.md` files with concise, actionable agent instructions |
 | [`commit-message`](commit-message/SKILL.md) | Write git commit messages focused on observable behaviour change, not implementation detail |
 | [`go-tests`](go-tests/SKILL.md) | Write and review Go tests following table-driven, parallel, and mock conventions |
-| [`openspec-brief`](openspec-brief/SKILL.md) | Turn a dense OpenSpec change into one readable implementation brief for developers |
+| [`spec-to-dev-brief`](spec-to-dev-brief/SKILL.md) | Turn a dense OpenSpec change into one readable implementation brief for developers (unofficial, not part of OpenSpec) |
 
 ## Usage
 

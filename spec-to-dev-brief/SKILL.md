@@ -1,6 +1,6 @@
 ---
-name: openspec-brief
-description: Turn an OpenSpec change (proposal.md, design.md, tasks.md, spec deltas) into one human-readable brief for developers, with Mermaid diagrams. Use this whenever someone wants an OpenSpec change explained, summarized, written up, reviewed, shared with the team, or turned into a design doc / developer doc / readable doc / implementation brief — and also when they say a spec is dense or unreadable, ask "what does this change actually do", or want something to hand reviewers before implementation starts. Prefer this over summarizing the spec files yourself; a plain summary reproduces the structure that made the spec hard to read in the first place.
+name: spec-to-dev-brief
+description: Unofficial, custom skill (not part of the OpenSpec project) that turns an OpenSpec change (proposal.md, design.md, tasks.md, spec deltas) into one human-readable brief for developers, with Mermaid diagrams. Use this whenever someone wants an OpenSpec change explained, summarized, written up, reviewed, shared with the team, or turned into a design doc / developer doc / readable doc / implementation brief — and also when they say a spec is dense or unreadable, ask "what does this change actually do", or want something to hand reviewers before implementation starts. Prefer this over summarizing the spec files yourself; a plain summary reproduces the structure that made the spec hard to read in the first place.
 ---
 
 # OpenSpec change → developer brief
