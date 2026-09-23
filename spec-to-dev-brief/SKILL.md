@@ -76,7 +76,7 @@ Two to four diagrams is normal. Each one has to answer a question that prose wou
 | `sequenceDiagram` | Ordering: handshakes, who waits for whom, what completes before what starts |
 | `stateDiagram-v2` | A lifecycle: modes, generations, suspend/resume, retry loops |
 
-The highest-value diagram in a brief is usually **before/after wiring** — two small flowcharts, or one with `subgraph Today` and `subgraph After`. It shows the delta directly, which is precisely what spec prose cannot do.
+The highest-value diagram in a brief is usually **before/after wiring**. It shows the delta directly, which is precisely what spec prose cannot do. Draw it as **two separate diagrams**, "today" first and "after" second, each with a one-line lead-in. Do not put the two states in one diagram as side-by-side subgraphs: with no edges between them, the layout engine orders subgraphs by the nodes inside them rather than by declaration order, so "after" often renders on the left and the reader sees the change backwards. Two diagrams also stay readable on a narrow screen.
 
 Label your edges. An unlabeled box-and-arrow graph carries almost no information. Keep each diagram under roughly a dozen nodes; if it wants to be bigger, it's two diagrams.
 
@@ -186,6 +186,7 @@ These are the failures that bite most often:
 - Arrows inside labels (`-->` in text) terminate the label early. Write "then" or use `&gt;`.
 - `stateDiagram-v2`, not `stateDiagram`. Only `-v2` supports composite states and notes reliably.
 - In `sequenceDiagram`, declare participants explicitly; implicit ones appear in first-mention order, which is rarely the order you want.
+- Unconnected `subgraph`s render in an order the layout engine picks, not the order you wrote them. The parser passes and the diagram still reads wrong — so split them into separate diagrams instead.
 - Keep semicolons out. They're legal but inconsistent support makes them a needless risk.
 
 ## When the change sits on a stack
