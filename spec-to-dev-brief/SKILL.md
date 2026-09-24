@@ -89,10 +89,14 @@ Decide where it goes before you write. Someone who asked for a doc to share, rev
 When you do write a file, write one markdown file. Default location, unless the user says otherwise:
 
 ```
-openspec/briefs/<change-name>-brief.md
+docs/change-briefs/<change-name>-brief.md
 ```
 
-Never write inside `openspec/changes/<name>/`. That directory's contents are schema-defined, and `openspec archive` moves the whole thing to `changes/archive/<date>-<name>/` when the change ships — a brief stored there relocates, and every link to it breaks, at exactly the moment reviewers go looking for it. A sibling `briefs/` directory keeps the brief next to the specs it explains without being part of them.
+If the repo already keeps docs under another directory, use that instead of creating `docs/`.
+
+Never write anywhere under `openspec/`. A brief is a snapshot: it goes out of date the first time someone edits the change, and nothing updates it. An agent working on the spec reads what is under `openspec/` and cannot tell a brief from an artifact, so it would take the old version as a requirement. Inside `openspec/changes/<name>/` it is worse again — `openspec archive` moves that directory when the change ships, and every link to the brief breaks.
+
+Location alone is not enough, because an agent can still reach the brief through a search. So every brief file opens with the notice in the template below.
 
 Keep this five-beat spine and its order — problem → shape → behavior → code → caveats is how a developer reads. Make the headings concrete where a concrete heading is clearly better ("Today: suspending only pauses the scheduler" beats "The problem").
 
@@ -101,7 +105,12 @@ Title the document with what the change *does*, not with its slug: "Suspending t
 ```markdown
 # <Change name as a claim, not a slug>
 
-*Source: `openspec/changes/<name>/` · <one line on any change this builds on>*
+> **Not part of the spec.** This brief summarizes `openspec/changes/<name>/`
+> as of <YYYY-MM-DD>, commit `<short-sha>`. It is not an OpenSpec artifact and
+> is not updated when the change is, so it may be out of date. For
+> requirements, read the change itself.
+
+*<One line on any change this builds on.>*
 
 <Lede: two or three sentences, no heading. What this change does and why it
 matters, written so someone who closes the tab here still understood the point.>
@@ -128,6 +137,8 @@ never a copy of tasks.md's checkboxes.>
 <Roads not taken, one line each, phrased as the question a reviewer would ask.
 Real risks. Anything the spec deliberately left unresolved.>
 ```
+
+Put the notice directly under the title, since the top of a file is what an agent reads before deciding what the file is. Fill in the commit with `git rev-parse --short HEAD`; it lets a reader run `git diff <sha> -- openspec/changes/<name>/` to see what changed since. Leave the notice out when answering in the conversation.
 
 Drop a section when the change genuinely has nothing for it; don't pad it.
 
@@ -193,4 +204,4 @@ These are the failures that bite most often:
 
 Changes often depend on earlier ones, and `tasks.md` usually opens with a prerequisite section naming them. A document that silently assumes a component from an unarchived change reads as fiction.
 
-State the baseline in the source line under the title — "Builds on `introduce-coordinator`; assumes the coordinator exists and is wired in" — and, where it matters, mark which parts of the "today" picture are today's *code* versus today's *plan*.
+State the baseline in the line under the notice — "Builds on `introduce-coordinator`; assumes the coordinator exists and is wired in" — and, where it matters, mark which parts of the "today" picture are today's *code* versus today's *plan*.
