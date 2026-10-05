@@ -10,11 +10,11 @@ OpenSpec artifacts are written so a machine can implement them without asking qu
 
 All three properties hide the thing a developer actually wants: **what will be different, and why.**
 
-Your job is to write the document a good staff engineer writes before asking their team to review a change. The reader is a developer on the team doing a first-pass review; the brief helps them understand the change, but the OpenSpec artifacts remain the authority for requirements. Not a summary of four files — one argument, told once, with diagrams where they carry weight.
+Your job is to write the document a good staff engineer writes before asking their team to review a change. The reader is a developer on the team doing a first-pass review; the brief helps them understand the change, but the OpenSpec artifacts remain the authority for requirements. The brief is an overview and a reading guide, not a replacement: the reader still has to read the change, so the brief must say plainly what it left out. Not a summary of four files — one argument, told once, with diagrams where they carry weight.
 
 Two rules shape everything below:
 
-- **Reorganize along "what changes", never along "which file it came from."** A section per source artifact, a requirements table, or a numbered decision list mirroring `design.md` all rebuild the maze you were asked to escape.
+- **Reorganize along "what changes", never along "which file it came from."** A section per source artifact, a requirements table, or a numbered decision list mirroring `design.md` all rebuild the maze you were asked to escape. The one exception is the decision index in the last section: decision names and chosen options only, with no rationale.
 - **Architecture, behavior and flow are the subject.** Requirement enumeration and decision cataloguing are not. Rationale still matters — it just belongs inline, where it explains a design, rather than in a list of its own.
 
 ## 1. Gather the source
@@ -114,15 +114,16 @@ Link claims that affect behavior, ordering, or compatibility to the relevant sou
 ```markdown
 # <Change name as a claim, not a slug>
 
-> **Not part of the spec.** This brief summarizes `openspec/changes/<name>/`
-> as of <YYYY-MM-DD>, with commit `<short-sha>` as a reference point. It is
-> not an OpenSpec artifact and is not updated when the change is, so it may
-> be out of date. For requirements, read the change itself.
+> **Not part of the spec.** This is an overview for a first-pass review. It
+> leaves out decisions, requirements, and edge cases; see
+> [Not covered in this brief](#not-covered-in-this-brief). Read the change
+> before you approve it. This brief summarizes `openspec/changes/<name>/` as
+> of <YYYY-MM-DD>, commit `<short-sha>`, and is not updated when the change is.
 
 *<If this builds on another change: name what the brief assumes, and whether that part is implemented or planned.>*
 
 <Lede: two or three sentences, no heading. What this change does and why it
-matters, written so someone who closes the tab here still understood the point.>
+matters, so a reader can decide whether to read the change in full.>
 
 ## The problem today
 <The concrete pain, grounded in available sources. Name files and types when
@@ -145,11 +146,18 @@ small table — never a copy of tasks.md's checkboxes.>
 ## Trade-offs and open questions
 <Roads not taken, one line each, phrased as the question a reviewer would ask.
 Real risks, narrower conflicts, and anything the spec left unresolved. Do not supply an unsupported answer.>
+
+## Not covered in this brief
+<One line per artifact, linked, saying how much of it the brief covers, with
+counts where they apply: "`specs/<capability>/spec.md`: 12 scenarios, 4 used as
+examples above"; "`tasks.md`: 18 tasks, not summarized". For `design.md`, list
+every decision, one line each: its name and the chosen option, linked to its
+heading, marked "explained above" when the body covers it. No rationale here.>
 ```
 
 Put the notice directly under the title, since the top of a file is what an agent reads before deciding what the file is. Fill in the commit with `git rev-parse --short HEAD`; it is a reference point, not proof that all source content was committed. If the source includes uncommitted working-tree edits, say so in the notice. A reader can run `git diff <sha> -- openspec/changes/<name>/` to see tracked changes since that commit.
 
-Drop a section when the change genuinely has nothing for it; don't pad it.
+Drop a section when the change genuinely has nothing for it; don't pad it. "Not covered in this brief" is the exception: every brief has it, because it tells the reader what they still have to read.
 
 **Never invent behavior the spec doesn't state.** If something is unresolved, it belongs in open questions. Specs leave gaps on purpose, and quietly filling them turns a trustworthy doc into a misleading one.
 
@@ -183,6 +191,7 @@ Write the draft, then delete. This step is not optional; it's where the document
 - **A fact appearing in four artifacts appears once here.** That redundancy was for machines.
 - **If it survives only because it was in the source, it goes.** Every sentence earns its place by telling this reader something.
 - **Read it as a developer who has never seen the change.** Would you understand it? Would you finish it?
+- **Never cut "Not covered in this brief".** Cutting the body makes that section more important, not less; update its counts after cutting.
 
 ## 8. Check the brief
 
@@ -196,11 +205,12 @@ Run the checks, fix what they report, and run them again until they all pass:
 
 - the brief is too long compared with the change — cut it (step 7);
 - the "Not part of the spec" notice is missing or not directly under the title;
+- the `## Not covered in this brief` section is missing;
 - `SHALL` or `MUST` appears outside a blockquote or code — rewrite that sentence as prose (step 6).
 
 Then check every diagram as described in [Checking the diagrams](#checking-the-diagrams).
 
-Finally, have a read-only second agent compare the brief with the change artifacts and any code checked for central claims, when an agent is available. Ask it to flag consequential omissions, unsupported claims, and misleading diagrams, not to rewrite the brief. Resolve its findings yourself, then rerun affected checks. Without a second agent, make the same comparison directly. Do not treat the review as proof that every requirement is covered; the brief is still a first-pass aid.
+Finally, have a read-only second agent compare the brief with the change artifacts and any code checked for central claims, when an agent is available. Ask it to flag consequential omissions, unsupported claims, and misleading diagrams, not to rewrite the brief. Also ask it to check that the decision index lists every decision in `design.md` and that the counts in "Not covered in this brief" are correct. Resolve its findings yourself, then rerun affected checks. Without a second agent, make the same comparison directly. Do not treat the review as proof that every requirement is covered; the brief is still a first-pass aid.
 
 ## Mermaid that actually renders
 

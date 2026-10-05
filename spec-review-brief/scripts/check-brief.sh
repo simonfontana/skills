@@ -34,6 +34,11 @@ if ! awk '
   failed=1
 fi
 
+if ! grep -q '^## Not covered in this brief[[:space:]]*$' "$brief"; then
+  echo "FAIL not-covered: the \"## Not covered in this brief\" section is missing."
+  failed=1
+fi
+
 if ! modal=$(awk '
   /^[[:space:]]*(```|~~~)/ { fenced = !fenced; next }
   fenced { next }
