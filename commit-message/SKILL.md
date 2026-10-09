@@ -52,12 +52,14 @@ not read the changed code.
 8. Measure the line lengths instead of estimating them:
 
    ```sh
-   awk 'NR == 1 && length > 50 || NR > 1 && length > 72 { print NR ": " length }' <<'EOF'
+   grep -n '' <<'EOF' | grep -E '^1:.{51,}$|^[0-9]+:.{73,}$'
    <message>
    EOF
    ```
 
-   Rewrap each line it reports, then run it again until it prints nothing.
+   The first `grep` numbers the lines, and the second prints each line
+   that is too long. Rewrap each line it prints, then run it again until
+   it prints nothing; `grep` then exits with status 1.
 9. Show the message in one fenced code block, with nothing else inside the
    block.
    - If the code does not show the motivation, show a draft with the parts
