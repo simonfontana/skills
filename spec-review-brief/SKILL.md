@@ -1,6 +1,6 @@
 ---
 name: spec-review-brief
-description: Only use when the user invokes this skill by name. Unofficial, custom skill (not part of the OpenSpec project) that turns an OpenSpec change (proposal.md, design.md, tasks.md, spec deltas) into one readable brief, with Mermaid diagrams where useful, for a developer's first-pass review. Writes the brief to .local/change-briefs/ in the project being reviewed.
+description: Turn an OpenSpec change into one readable brief, with Mermaid diagrams where useful, for a developer's first-pass review. Writes to .local/change-briefs/. Unofficial; not part of OpenSpec.
 disable-model-invocation: true
 ---
 
@@ -54,6 +54,12 @@ Read every artifact you find. Typically:
 
 If artifacts disagree, do not choose a side silently. Ask before writing if either reading would change the brief's central claim or runtime diagram, or if a missing answer would do the same. Put narrower conflicts in open questions, without presenting either reading as settled.
 
+### When the change sits on a stack
+
+Changes often depend on earlier ones, and `tasks.md` usually opens with a prerequisite section naming them. Read only enough of an unarchived prerequisite to tell which parts exist in code and which are planned; leave the other change unsummarized. A document that silently assumes a component from an unarchived change reads as fiction.
+
+State the specific baseline in the line under the notice — "Builds on `introduce-coordinator`; coordinator wiring is planned, not yet in code" — and, where it matters, mark which parts of the "today" picture are today's *code* versus today's *plan*. If the status cannot be established and changes the central story, ask before writing.
+
 ## 2. Fill gaps in today's behavior
 
 Trust the change's own description of today's behavior by default. When a claim about current code is central to the brief's problem or before/after picture and the named code is available, follow only enough of that code path to confirm or reject it. If the code contradicts the change, pause and ask about the specific discrepancy before writing the brief. Do not audit unrelated behavior.
@@ -85,11 +91,13 @@ Use diagrams only where they clarify a real structural, ordering, or state chang
 | `sequenceDiagram` | Ordering: handshakes, who waits for whom, what completes before what starts |
 | `stateDiagram-v2` | A lifecycle: modes, generations, suspend/resume, retry loops |
 
-When wiring changes, **before/after wiring** often shows the delta directly. Draw it as **two separate diagrams**, "today" first and "after" second, each with a one-line lead-in. Do not put the two states in one diagram as side-by-side subgraphs: with no edges between them, the layout engine orders subgraphs by the nodes inside them rather than by declaration order, so "after" often renders on the left and the reader sees the change backwards. Two diagrams also stay readable on a narrow screen.
+When wiring changes, **before/after wiring** often shows the delta directly. Draw it as **two separate diagrams**, "today" first and "after" second, each with a one-line lead-in.
 
 Label conceptual diagrams as conceptual, and do not imply ownership, component boundaries, or ordering that the source does not establish. Label your edges. An unlabeled box-and-arrow graph carries almost no information. Keep each diagram under roughly a dozen nodes; if it wants to be bigger, it's two diagrams.
 
 Never restate a diagram in the paragraph next to it. The diagram shows *what* the order is; the prose says *why* it has to be that order.
+
+Before writing the first diagram, read [mermaid.md](mermaid.md) for the syntax rules that keep it rendering.
 
 ## 5. The document
 
@@ -105,7 +113,7 @@ Never write anywhere under `openspec/`. A brief is a snapshot: it goes out of da
 
 Location alone is not enough, because an agent can still reach the brief through a search. So every brief file opens with the notice in the template below.
 
-Keep this five-beat spine and its order — problem → shape → behavior → code → caveats is how a developer reads. Make the headings concrete where a concrete heading is clearly better ("Today: suspending only pauses the scheduler" beats "The problem").
+Keep these five sections in this order — problem → shape → behavior → code → caveats is how a developer reads. Make the headings concrete where a concrete heading is clearly better ("Today: suspending only pauses the scheduler" beats "The problem").
 
 Title the document with what the change *does*, not with its slug: "Suspending the vehicle now stops every component, not just the scheduler" tells a reader whether to keep going; "Coordinator Resilience" does not.
 
@@ -201,42 +209,8 @@ Run the checks, fix what they report, and run them again until they all pass:
 <skill-dir>/scripts/check-brief.sh <brief>.md <change-dir>
 ```
 
-`<skill-dir>` is the directory holding this file. `<change-dir>` is the change's directory, `openspec/changes/<name>/` or its `archive/` path. The script needs only Bash and standard tools. It fails when:
+`<skill-dir>` is the directory holding this file. `<change-dir>` is the change's directory, `openspec/changes/<name>/` or its `archive/` path. The script needs only Bash and standard tools, and each `FAIL` line says what to fix.
 
-- the brief is too long compared with the change — cut it (step 7);
-- the "Not part of the spec" notice is missing or not directly under the title;
-- the `## Not covered in this brief` section is missing;
-- `SHALL` or `MUST` appears outside a blockquote or code — rewrite that sentence as prose (step 6).
-
-Then check every diagram as described in [Checking the diagrams](#checking-the-diagrams).
+If the brief has diagrams, check each one as described in [mermaid.md](mermaid.md#checking-the-diagrams).
 
 Finally, have a read-only second agent compare the brief with the change artifacts and any code checked for central claims, when an agent is available. Ask it to flag consequential omissions, unsupported claims, and misleading diagrams, not to rewrite the brief. Also ask it to check that the decision index lists every decision in `design.md` and that the counts in "Not covered in this brief" are correct. Resolve its findings yourself, then rerun affected checks. Without a second agent, make the same comparison directly. Do not treat the review as proof that every requirement is covered; the brief is still a first-pass aid.
-
-## Mermaid that actually renders
-
-A broken diagram can go unnoticed: some viewers show a raw error block, but others drop the diagram without any error, so a reader cannot tell anything is missing. That is why the diagrams have to be checked before you hand the brief over.
-
-### Rules for writing diagrams
-
-- Quote flowchart node labels: `A["Coordinator (v2)"]`. Unquoted parentheses, brackets, colons and commas break the parser.
-- Quote flowchart edge labels: `A -->|"starts, then waits"| B`.
-- In `stateDiagram-v2`, give any state name with spaces or punctuation an ID: `state "Waiting for ack" as Waiting`, then use `Waiting` in transitions.
-- Never write `-->` inside a label or message; it ends the label early. Write "then".
-- `end` as a bare node ID collides with `subgraph`'s terminator. Use another ID, such as `Done`.
-- `stateDiagram-v2`, not `stateDiagram`. Only `-v2` supports composite states and notes reliably.
-- In `sequenceDiagram`, declare every participant at the top. Undeclared ones appear in first-mention order, which is rarely the order you want.
-- Keep semicolons out of labels and messages. Mermaid can read one as the end of a statement.
-- Unconnected `subgraph`s render in an order the layout engine picks, not the order you wrote them. A validator passes and the diagram still reads wrong, so split them into separate diagrams instead.
-
-### Checking the diagrams
-
-1. If your agent has a Mermaid validation tool, for example `mermaid-diagram-validator` from the Mermaid Chart VS Code extension, run it on each diagram. A reported syntax error is a result: fix it and run the tool again. If the tool itself fails, errors, or does not respond, stop using it for this brief and go to step 2. Do not look for other tools or install anything.
-2. Without a working tool, check by reading, as a separate pass after the brief is written. Take one diagram at a time, go through every rule above against it, and fix what fails.
-
-In the conversation summary, say how the diagrams were checked: with the tool, or by reading against the rules because no validator was available. Leave this out of the brief itself.
-
-## When the change sits on a stack
-
-Changes often depend on earlier ones, and `tasks.md` usually opens with a prerequisite section naming them. Read only enough of an unarchived prerequisite to tell which parts exist in code and which are planned; do not summarize the other change. A document that silently assumes a component from an unarchived change reads as fiction.
-
-State the specific baseline in the line under the notice — "Builds on `introduce-coordinator`; coordinator wiring is planned, not yet in code" — and, where it matters, mark which parts of the "today" picture are today's *code* versus today's *plan*. If the status cannot be established and changes the central story, ask before writing.

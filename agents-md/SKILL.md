@@ -1,34 +1,34 @@
 ---
 name: agents-md
-description: ALWAYS read this skill before creating or modifying any AGENTS.md or CLAUDE.md file. Covers creating AGENTS.md, updating AGENTS.md, maintaining agent docs, setting up CLAUDE.md, documenting repository agent conventions, and keeping coding-agent instructions minimal and reference-backed.
+description: AGENTS.md and CLAUDE.md files. Read before creating or editing either one.
 ---
 
 # Maintaining AGENTS.md
 
-> **Required**: Read this entire file before writing or editing any AGENTS.md content.
+An AGENTS.md is a cache: it holds only what an agent cannot find by reading the code, the directory listing, or standard tooling.
+Test every line with one question: would an agent who just read the source already know this?
+If yes, leave the line out.
 
-Goal: concise, actionable agent instructions.
-- Target under 4,000 characters; never exceed 6,000.
+Size: under 4,000 characters; never over 6,000.
 
 ## Workflow
 
-1. Inspect before writing:
+1. Inspect the repository before writing:
    - package manager: lock files and manifests
    - commands: `Makefile`, task runners, CI workflows
-   - docs/specs/policies: `README.md`, `CONTRIBUTING.md`, `docs/`, `specs/`, `.github`, `.skills`, `AGENTS.md`
-   - conventions: current code patterns, test layout, generated files, legacy areas avoid (`vendor/`, `build/`)
-2. Write the smallest useful file.
-3. Verify exact paths and commands exist.
+   - docs, specs, and policies: `README.md`, `CONTRIBUTING.md`, `docs/`, `specs/`, `.github/`, `.skills/`, an existing `AGENTS.md`
+   - conventions: code patterns, test layout, generated files, legacy areas to avoid (`vendor/`, `build/`)
+2. Write the smallest file that covers the sections below that apply.
+3. Check the file: every path and command in it exists, and `wc -c AGENTS.md` reports under 4,000.
 
-## File Setup
+## File setup
 
 - Create `AGENTS.md` at the repository root.
-- If a Claude-compatible entrypoint is required, symlink `CLAUDE.md` to `AGENTS.md`.
-- Do not maintain divergent `AGENTS.md` and `CLAUDE.md` copies.
+- When a Claude-compatible entry point is needed, make `CLAUDE.md` a symlink to `AGENTS.md`, so only one copy exists.
 
 ## Sections
 
-Add project-specific sections when they orient an agent or prevent mistakes. Drop any that don't add value for the specific repo.
+Include a section only when it orients an agent or prevents a mistake in this repository.
 
 | Section | Include when… |
 |---------|---------------|
@@ -40,35 +40,31 @@ Add project-specific sections when they orient an agent or prevent mistakes. Dro
 | Do Not Modify | There are generated, vendored, or script-maintained files |
 | Guardrails | There are rules agents must follow (validation steps, dependency policy, doc style) |
 
-### Format guidance
+## Writing rules
 
-- Put commands in a table when there is more than one.
-- Keep conventions as one-rule-per-bullet lists.
-- Use repo-relative paths in External References tables.
+- Write terse, impersonal text in headings, bullets, and tables, one rule per bullet.
+- Put commands in a table when there are several.
+  Prefer file-scoped test, lint, and typecheck commands; list a full build only when no narrower command exists.
+- Use exact repo-relative paths in place of phrases like "see docs".
+- Point to existing docs, specs, and policies instead of copying them.
+  When setup, architecture, API, security, release, or policy docs exist, list them under External References.
+- Give a reason only when it prevents a likely mistake.
+- Use [semantic line breaks](https://sembr.org/): break lines at sentence and clause boundaries, not at a fixed column.
+- When editing an existing file, keep its content as terse as you found it.
 
-## Writing Rules
+The cache test usually removes:
 
-- **Only include what an agent cannot learn by reading the code, directory listing, or standard tooling.** Self-check every line: "Would an agent who just read the source already know this?" If yes, omit it.
-- Use [semantic line breaks](https://sembr.org/): break lines at sentence and clause boundaries, not at a fixed column width.
-- Use headings, bullets, and tables; avoid paragraphs; no filler, no conversational tone.
-- Use repo-relative paths; avoid vague references like "see docs".
-- Reference existing docs/specs/policies instead of copying them.
-- List exact external files for setup, architecture, API specs, security, release, and policy docs when they exist.
-- Prefer file-scoped test/lint/typecheck commands; include full builds only when no narrower command exists.
-- Put commands in tables when there is more than one.
-- Keep one rule per bullet.
-- Keep rationale out unless it prevents a likely mistake.
-- Do not restate linter, formatter, or typechecker config.
-- Do not list installed skills or plugins.
-- Do not include generic quality slogans.
-- Never expand existing content into verbose prose.
+- intros, conclusions, and quality slogans
+- linter, formatter, or typechecker settings
+- installed skills or plugins
+- walkthroughs of control flow or lifecycles
+- type or file listings that a directory listing shows
+- test conventions the code already shows (mocks, test clocks, in-memory stores)
 
-## External Reference Rules
+## External References
 
-- Use "Consult when…" as the header column — describe the trigger (both editing and Q&A), not the topic.
-- Include both modification triggers ("changing X") and inquiry triggers ("answering questions about X").
-
-Good:
+Name the trigger, not the topic, in a "Consult when…" column.
+Cover both triggers: changing the subject, and answering questions about it.
 
 ```markdown
 ## External References
@@ -77,13 +73,3 @@ Good:
 | Changing or asking about the API contract | `docs/api.md` |
 | Following or asking about the release process | `docs/releasing.md` |
 ```
-
-## Anti-Patterns
-
-- welcome text, intros, conclusions, or pleasantries
-- long prose explaining why instructions matter
-- duplicated content from `README.md`, `CONTRIBUTING.md`, or policy docs
-- project-wide commands when file-scoped commands are available
-- "Testing" sections that repeat root conventions (mocks, test clocks, in-memory stores)
-- flow/lifecycle walkthroughs — the agent reads code for flow; only document what the code doesn't make obvious
-- type or file listings the agent would find by listing the directory

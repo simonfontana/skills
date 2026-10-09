@@ -1,21 +1,20 @@
 ---
 name: go-tests
-description: Write or review Go tests in this repository. Use when creating new tests, modifying existing tests, or reviewing test code.
+description: Go tests in this repository. Use when writing, changing, or reviewing `_test.go` code.
 ---
 
 # Testing Conventions
+
+When reviewing, check every rule below against each test you touch.
 
 ## Rules
 
 - External test package (`package foo_test`) to verify via public API.
 - `t.Parallel()` on every test and subtest unless there is shared mutable state that prevents it (e.g., a package-level singleton, shared temp directory, or serial database).
-- Table-driven tests (`gotests` convention) when there are multiple cases exercising the same code path with different inputs. A single focused test function is fine when there is genuinely only one scenario or when the setup/assertion logic differs significantly per case.
+- Table-driven tests (`gotests` convention, see [Table-Driven Test Template](#table-driven-test-template)) when there are multiple cases exercising the same code path with different inputs. A single focused test function is fine when there is genuinely only one scenario or when the setup/assertion logic differs significantly per case.
 - Group inputs in a nested `args` struct when there are multiple inputs. Inline when trivial.
-- **Never use `time.Sleep` in tests.** Use `timing.FixedClock` with explicit advances, channels, or `assert.Eventually`/`require.Eventually` for async assertions.
-- `timing.FixedClock` for time-sensitive tests; advance explicitly.
+- Control time with `timing.FixedClock` and explicit advances; wait on async work with channels or `assert.Eventually`/`require.Eventually`. Never `time.Sleep`.
 - `require` for fatal preconditions (early return on failure), `assert` for test assertions.
-- Mocks: add `//mockery:generate: true` above the interface and run `make generate`.
-- Mock setup should only include expectations that are *relevant to the scenario under test*. If a mock expectation isn't part of the stimulus or the assertion, leave it out. The test fixture should handle unrelated calls via defaults or `.Maybe()` — don't litter the test body with irrelevant `.On(...)` lines that obscure what's actually being tested. A reader should be able to look at the mock setup and immediately understand what inputs are being controlled and why.
 
 ## Logging in Tests
 
@@ -41,6 +40,10 @@ Use **hand-rolled stubs** when:
 
 A stub is just a struct that satisfies the interface with hard-coded or configurable return values. Place stubs at the top of the test file or in a shared `helpers_test.go`.
 
+To generate a mock, add `//mockery:generate: true` above the interface and run `make generate`.
+
+In the test body, set only the mock expectations that are the stimulus or the assertion of the scenario, so a reader sees at a glance which inputs the test controls. Let the fixture absorb unrelated calls through defaults or `.Maybe()`.
+
 ## Test Helper Organisation
 
 When multiple test files in a package share setup logic, extract helpers into a dedicated `helpers_test.go` (or `mock_helpers_test.go` for mock-specific wiring). This keeps individual test files focused on scenarios, not plumbing.
@@ -52,69 +55,30 @@ Guidelines:
 
 ## Table-Driven Test Template
 
+Replace `Foo`, `Type`, and the `args` fields. Drop `wantErr` and the error branch when the function returns no error.
+
 ```go
 func TestFoo(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		name string
-		args args
-		want Type
-	}{
-		{
-			name: "descriptive case name",
-			args: args{...},
-			want: expected,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			got := DoSomething(tt.args.input)
-
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-```
-
-## Example
-
-```go
-func TestClamp(t *testing.T) {
-	t.Parallel()
-
 	type args struct {
-		value int
-		min   int
-		max   int
+		input Type
+		opts  Options
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    int
+		want    Type
 		wantErr bool
 	}{
 		{
-			name: "value within range unchanged",
-			args: args{value: 5, min: 0, max: 10},
-			want: 5,
+			name: "descriptive case name",
+			args: args{input: ..., opts: ...},
+			want: ...,
 		},
 		{
-			name: "value below min clamped up",
-			args: args{value: -3, min: 0, max: 10},
-			want: 0,
-		},
-		{
-			name: "value above max clamped down",
-			args: args{value: 15, min: 0, max: 10},
-			want: 10,
-		},
-		{
-			name:    "min greater than max returns error",
-			args:    args{value: 5, min: 10, max: 0},
+			name:    "invalid input returns error",
+			args:    args{input: ..., opts: ...},
 			wantErr: true,
 		},
 	}
@@ -122,7 +86,7 @@ func TestClamp(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got, err := Clamp(tt.args.value, tt.args.min, tt.args.max)
+			got, err := foo.Foo(tt.args.input, tt.args.opts)
 
 			if tt.wantErr {
 				require.Error(t, err)

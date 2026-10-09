@@ -1,6 +1,6 @@
 ---
 name: commit-message
-description: Write git commit messages for staged changes or existing commits. Use when the user asks to write, draft, review, or rewrite a commit message.
+description: Commit messages for staged changes or existing commits. Use when asked to write, review, or rewrite a commit message.
 ---
 
 # Commit Messages
@@ -21,12 +21,12 @@ not read the changed code.
      ```
 
    - If the user describes the change instead, use the description.
-2. If there is an existing message, from the user or from a commit, do not
-   read it or use it until step 7. Until then, read an existing commit only
-   with the commands in steps 1 and 3. Other commands, such as `git log`
-   or `git show` without `--format=`, print the message. If the user pasted
-   it, do not look back at it while you write. See "Improving an existing
-   message" for the reason.
+2. If there is an existing message, from the user or from a commit, write
+   your own from the diff alone and read the existing one only at step 7;
+   "Improving an existing message" gives the reason. Until then, read an
+   existing commit only with the commands in steps 1 and 3. Other
+   commands, such as `git log` or `git show` without `--format=`, print
+   the message. If the user pasted it, leave it unread while you write.
 3. Read enough of the surrounding code to name the actors: the callers,
    background tasks, services, or people that the change affects. If the
    diff does not show why the change is needed, read the nearest test,
@@ -72,7 +72,8 @@ not read the changed code.
 
 - Use the imperative mood: "Prevent", not "Prevents" or "Prevented".
 - Use at most 50 characters.
-- Do not use conventional commit prefixes (`feat:`, `fix:`, `chore:`).
+- Start with the verb. Leave out conventional commit prefixes (`feat:`,
+  `fix:`, `chore:`).
 - Describe the change that a user, operator, or caller would notice, not
   how it was made. For a refactoring, rename, or test-only change, the
   subject may describe the structure or the tests instead.
@@ -128,13 +129,12 @@ An existing subject often names the functions and variables its author
 edited, such as `Check generation in publishResult`. Once you have read
 those names, they look like the normal words for the change, and they end
 up in the rewrite. Its framing has the same effect: a subject that
-describes the mechanism leads you to describe the mechanism too.
+describes the mechanism leads you to describe the mechanism too. That is
+why step 2 has you write your own message first.
 
-1. Do not look at the existing message before you have written your own.
-   Write yours from the diff alone.
-2. Then read the existing message and compare the two.
-3. Keep a name from it only if it passes "Words and names". Do not lead
-   with the mechanism just because the existing subject did.
+When you compare the two, keep a name from the existing message only if
+it passes "Words and names", and follow "Subject" even when the existing
+subject leads with the mechanism.
 
 ## Examples
 
